@@ -1,20 +1,32 @@
 int input;
 int AnalogPin = A0;
-int piezoPin = 9;
+int piezoPin = 11;
+int button1 = 10;
 
 void setup() {
 Serial.begin(9600);  
 pinMode (piezoPin, OUTPUT);
+pinMode (button1, OUTPUT);
+pinMode (AnalogPin, INPUT);
 }
 
 void loop() {
   input = analogRead(AnalogPin);
   Serial.println(input);
-  if (input < 20)
+  Serial.println(digitalRead(button1));
+  
+  if (input < 600)
   {
-  analogWrite (piezoPin, 200);
-  delay(5000);
-  analogWrite (piezoPin,0);
+    
+    while (digitalRead(button1) != 1)
+  {
+     analogWrite (piezoPin, 200);
+
   }
+  
+   analogWrite (piezoPin,0);
+  }
+
+  
 delay(500);
 }
