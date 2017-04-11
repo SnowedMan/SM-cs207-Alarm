@@ -146,16 +146,19 @@ float Delay[] [6]= {
 
 
 int AnalogPin = A0;
-int piezoPin = 11;
-int button1 = 10;
+int button1 = 4;
+int button2 = 5;
+int state = 0;
 
 int i = 0;
 int j = 0;
 
+int checkSensor(int);
 
 void setup() {
 Serial.begin(9600);  
-pinMode (button1, OUTPUT);
+pinMode (button1, INPUT);
+pinMode (button2, INPUT);
 pinMode (AnalogPin, INPUT);
 pinMode(8, OUTPUT);   
 pinMode(9, OUTPUT);       
@@ -163,33 +166,50 @@ digitalWrite(9,LOW);
 }
 
 void loop() {
-if (input < 600)
+if (analogRead (AnalogPin) > 300) // start when photoresisitor's input is > 300
 {
-  while(digitalRead(button1) != 1)
-  {
+  while(digitalRead(state != 3)) // playin the song before password is inputed
+  {    
     j = 0;
-    while ((Delay[i] [j] != 0) && (digitalRead(button1) != 1)
+    while ((Delay[i] [j] != 0) && (state != 3)) // playing 1 verse of song
       {
       tone(8,note[i][j],Delay[i][j]);
       delay (Delay[i][j]+1);
       j++;
+      state = checkSensor(state);
       }
 
 
-  if ( (i == 5) || (i == 7) || (i == 11) || (i == 13))
+  if ( (i == 5) || (i == 7) || (i == 11) || (i == 13)) // small pause
     delay (Delay[i][j-1]+1);
   
-  if (i == 15)
+  if (i == 15) // long pause
     delay (Delay[i][j-1]*2);
-  }
 
-  i++;
+     i++;
 
-  if (i == 16)
+  if (i == 16)  //if i is 16 the song should be restarted with 1 second of silince
   {
     i = 0; 
     digitalWrite(8,LOW);
     delay(1000);
   }
+  }
+digitalWrite(8,LOW); // if password is inputed, stop the song
+ 
 }
+}
+
+
+int checkSensor(int state){ // function for checking password and retarning prosess of it's input
+  if ((state == 0) && (digitalRead(button1) == 1))
+  return 1;
+
+  if ((state == 1) && (digitalRead(button2) == 1))
+  return 2;
+
+  if ((state == 2) && (digitalRead(button1) == 1))
+  return 3;
+
+  return state;
 }
